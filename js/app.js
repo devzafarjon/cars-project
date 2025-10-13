@@ -1,15 +1,28 @@
-const elTimer = document.getElementById("timer")
-const elBtn = document.getElementById("f")
+const elOfflinePage = document.getElementById("offlinePage")
+const elRetryBtn = document.getElementById("retryBtn")
 
-setInterval(() => {
-  const date = new Date()
-  const time = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
-  elTimer.innerHTML = time
-}, 1000)
-
-const worker = new Worker("worker.js")
-console.log(worker)
-
-elBtn.addEventListener("click", () => {
-  worker.postMessage("test")
+window.addEventListener("DOMContentLoaded", () => {
+  if (!window.navigator.onLine) {
+    elOfflinePage.classList.remove("hidden")
+  } else {
+    elOfflinePage.classList.add("hidden")
+  }
 })
+
+window.addEventListener("online", () => {
+  elOfflinePage.classList.add("hidden")
+})
+
+window.addEventListener("offline", () => {
+  elOfflinePage.classList.remove("hidden")
+})
+
+if (elRetryBtn) {
+  elRetryBtn.addEventListener("click", () => {
+    if (window.navigator.onLine) {
+      elOfflinePage.classList.add("hidden")
+    } else {
+      location.reload()
+    }
+  })
+}

@@ -7,9 +7,48 @@
     <link rel="stylesheet" href="./css/output.css" />
   </head>
   <body>
-    <h1 id="timer">salom</h1>
+    <div
+      class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+      id="offlinePage"
+    >
+      <div
+        class="w-full max-w-md bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100 rounded-xl shadow-xl"
+      >
+        <div class="p-6 text-center">
+          <div
+            class="mx-auto mb-4 h-12 w-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center dark:bg-red-900/30"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              class="h-6 w-6"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-.75 6a.75.75 0 0 1 1.5 0v6a.75.75 0 0 1-1.5 0V8.25Zm.75 9a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <h2 id="offlineTitle" class="text-2xl font-semibold mb-2">
+            Internet bilan muammo bor
+          </h2>
+          <p id="offlineDesc" class="mb-6">
+            Internet aloqangizni tekshiring va qayta urinib ko'ring.
+          </p>
+          <div class="flex items-center justify-center gap-3">
+            <button
+              id="retryBtn"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+            >
+              Qayta urinib ko'rish
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <button id="f">Qotirish</button>
     <script type="module" src="./js/app.js"></script>
   </body>
 </html>
