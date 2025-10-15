@@ -1,8 +1,8 @@
 const baseURL = "https://json-api.uz/api/project/fn44"
 
-export async function getAll() {
+export async function getAll(query = "") {
   try {
-    const req = await fetch(baseURL + "/cars")
+    const req = await fetch(baseURL + `/cars${query ? query : ""}`)
     const res = await req.json()
 
     return res

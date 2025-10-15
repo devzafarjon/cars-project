@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./css/output.css" />
   </head>
   <body>
+    <!-- offline page -->
     <div
       class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
       id="offlinePage"
@@ -48,6 +49,38 @@
         </div>
       </div>
     </div>
+
+    <section class="py-10">
+      <div class="container mx-auto px-5">
+        <div class="flex items-center gap-5 pb-5">
+          <select class="select select-primary" id="filterTypeSelect">
+            <option disabled selected>
+              Nima bo'yicha filter qilmoqchisiz?
+            </option>
+            <option value="colorName">Rang</option>
+            <option value="category">Turkum</option>
+            <option value="year">Yil</option>
+            <option value="country">Davlat</option>
+            <option value="maxSpeed">Tezlik</option>
+          </select>
+          <select class="select select-primary hidden" id="filterValueSelect">
+            <option disabled selected>All</option>
+          </select>
+        </div>
+        <div id="container" class="grid grid-cols-3 gap-5"></div>
+      </div>
+    </section>
+
+    <!-- Templates -->
+    <template id="cardTemplate">
+      <div class="card bg-base-100 card-md shadow-sm">
+        <div class="card-body">
+          <h2 class="card-title"></h2>
+          <p></p>
+          <div class="justify-end card-actions"></div>
+        </div>
+      </div>
+    </template>
 
     <script type="module" src="./js/app.js"></script>
   </body>
