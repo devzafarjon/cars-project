@@ -4,6 +4,7 @@ import { ui } from "./ui.js"
 const elOfflinePage = document.getElementById("offlinePage")
 const elFilterTypeSelect = document.getElementById("filterTypeSelect")
 const elFilterValueSelect = document.getElementById("filterValueSelect")
+const elSearchInput = document.getElementById("searchInput")
 const elRetryBtn = document.getElementById("retryBtn")
 
 let backendData = null
@@ -63,21 +64,47 @@ elFilterValueSelect.addEventListener("change", (e) => {
   }
 })
 
+elSearchInput.addEventListener("input", (e) => {
+  const key = e.target.value
+
+  if (key.length >= 3) {
+    if (backendData) {
+      worker.postMessage({
+        functionName: "search",
+        params: [backendData.data, key],
+      })
+    }
+  } else if (key.length === 0) {
+    ui(backendData.data)
+  }
+})
+
 worker.addEventListener("message", (e) => {
-  const result = e.data
-  elFilterValueSelect.classList.remove("hidden")
-  elFilterValueSelect.innerHTML = ""
-  const option = document.createElement("option")
-  option.selected = true
-  option.disabled = true
-  option.textContent = "All"
-  elFilterValueSelect.appendChild(option)
-  result.forEach((element) => {
+  const response = e.data
+
+  if (response.target === "filterByType") {
+    elFilterValueSelect.classList.remove("hidden")
+    elFilterValueSelect.innerHTML = ""
     const option = document.createElement("option")
-    option.value = element
-    option.textContent = element
+    option.selected = true
+    option.disabled = true
+    option.textContent = "All"
     elFilterValueSelect.appendChild(option)
-  })
+    result.forEach((element) => {
+      const option = document.createElement("option")
+      option.value = element
+      option.textContent = element
+      elFilterValueSelect.appendChild(option)
+    })
+  } else if (response.target === "search") {
+    const elContainer = document.getElementById("container")
+    elContainer.innerHTML = ""
+    if (response.result.length === 0) {
+      ui(response.result)
+    } else {
+      alert("Hech narsa topilmadi")
+    }
+  }
 })
 
 window.addEventListener("online", () => {
