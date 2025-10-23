@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body>
+    <img
+      id="cursor"
+      class="pointer-events-none select-none absolute !z-999 -translate-x-2/4 -translate-y-2/4 transition-all duration-[0.1s]"
+      src="./images/cursor.png"
+      alt=""
+      aria-hidden="true"
+      width="32"
+      height="32"
+    />
+    <!-- Internet yo'qligida chiqadigan biror narsa -->
+
+    <div class="fixed inset-0 bg-accent flex items-center" id="offlinePage">
+      <div class="flex flex-col max-w-96 w-full">
+        <h2 class="text-3xl mb-3">Internet bilan muammo bor</h2>
+        <p>
+          Siz hozir offline holatidasiz. Saytdan foydalanish uchun internetga
+          ulaning
+        </p>
+      </div>
+    </div>
+
+    <!-- Filter -->
+
+    <section class="py-10">
+      <div class="container mx-auto px-5">
+        <div class="flex justify-between items-center pb-5">
+          <div class="flex items-center gap-4">
+            <!-- Filter Type Select -->
+            <div class="relative">
+              <select
+                class="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-3 pr-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md min-w-[200px]"
+                id="filterTypeSelect"
+              >
+                <option disabled selected>
+                  Nima bo'yicha filter qilmoqchisiz?
+                </option>
+                <option value="colorName">Rang</option>
+                <option value="category">Turkum</option>
+                <option value="year">Yil</option>
+                <option value="country">Davlat</option>
+                <option value="maxSpeed">Tezlik</option>
+              </select>
+              <div
+                class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
+              >
+                <svg
+                  class="w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  ></path>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Filter Value Select -->
+            <div
+              class="relative"
+              style="display: none"
+              id="filterValueContainer"
+            >
+              <select
+                class="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-3 pr-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md min-w-[120px]"
+                id="filterValueSelect"
+              >
+                <option disabled selected>All</option>
+              </select>
+              <div
+                class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
+              >
+                <svg
+                  class="w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  ></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search Bar -->
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <svg
+                class="h-5 w-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
+              </svg>
+            </div>
+            <input
+              type="search"
+              placeholder="Mashinalarni qidiring..."
+              id="searchInput"
+              class="block w-full pl-10 pr-20 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md bg-white text-gray-900 placeholder-gray-500"
+            />
+            <div
+              class="absolute inset-y-0 right-0 flex items-center pr-3 space-x-1"
+            >
+              <kbd
+                class="px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-100 border border-gray-200 rounded shadow-sm"
+                >⌘</kbd
+              >
+              <kbd
+                class="px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-100 border border-gray-200 rounded shadow-sm"
+                >K</kbd
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-5" id="container"></div>
+
+        <!-- Pagination -->
+        <div class="join mb-5 pt-[20px] mx-auto" id="pagination"></div>
+      </div>
+    </section>
+
+    <!-- Modals -->
+
+    <dialog id="editModal" class="modal backdrop-blur-sm">
+      <div
+        class="modal-box max-w-md bg-white rounded-2xl shadow-2xl border border-gray-200"
+      >
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-10 h-10 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                ></path>
+              </svg>
+            </div>
+            <div>
+              <h3
+                class="text-xl font-bold text-gray-900"
+                id="editedElementTitle"
+              >
+                Tahrirlash
+              </h3>
+              <p class="text-sm text-gray-600">
+                Mashina ma'lumotlarini yangilang
+              </p>
+            </div>
+          </div>
+          <button
+            class="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+            onclick="editModal.close()"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Modal Form -->
+        <form id="editForm" class="space-y-6">
+          <div>
+            <label
+              for="editName"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Mashina nomi
+            </label>
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+              >
+                <svg
+                  class="h-5 w-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+              </div>
+              <input
+                type="text"
+                name="name"
+                id="editName"
+                placeholder="Mashina nomini kiriting"
+                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors duration-200"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="editDescription"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Tavsif
+            </label>
+            <div class="relative">
+              <div class="absolute top-3 left-3 pointer-events-none">
+                <svg
+                  class="h-5 w-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h7"
+                  ></path>
+                </svg>
+              </div>
+              <textarea
+                name="description"
+                id="editDescription"
+                placeholder="Mashina haqida batafsil ma'lumot kiriting"
+                rows="4"
+                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors duration-200 resize-none"
+                required
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Modal Actions -->
+          <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+            <button
+              type="button"
+              class="px-6 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors duration-200"
+              onclick="editModal.close()"
+            >
+              Bekor qilish
+            </button>
+            <button
+              type="submit"
+              class="px-6 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-lg font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+            >
+              <span class="flex items-center">
+                <svg
+                  class="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
+                </svg>
+                Saqlash
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+
+    <!-- Templates -->
+    <template id="cardTemplate">
+      <div
+        class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden"
+      >
+        <div class="p-6">
+          <!-- Car Model Name -->
+          <h2 class="text-xl font-bold text-gray-900 mb-2"></h2>
+
+          <!-- Description -->
+          <p class="text-gray-600 text-sm mb-4 leading-relaxed"></p>
+
+          <!-- Car Specifications -->
+          <div class="space-y-2 mb-6">
+            <div class="flex items-center text-sm text-gray-700">
+              <svg
+                class="w-4 h-4 mr-2 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              <span class="font-medium">Mamlakat:</span>
+              <span class="ml-1 text-gray-600" data-country></span>
+            </div>
+
+            <div class="flex items-center text-sm text-gray-700">
+              <svg
+                class="w-4 h-4 mr-2 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                ></path>
+              </svg>
+              <span class="font-medium">Turkum:</span>
+              <span class="ml-1 text-gray-600" data-category></span>
+            </div>
+
+            <div class="flex items-center text-sm text-gray-700">
+              <svg
+                class="w-4 h-4 mr-2 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"
+                ></path>
+              </svg>
+              <span class="font-medium">Rang:</span>
+              <div class="ml-2 flex items-center">
+                <div
+                  class="w-4 h-4 rounded-full border border-gray-300 mr-2"
+                  data-color-circle
+                ></div>
+                <span class="text-gray-600" data-color></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex justify-end space-x-3">
+            <!-- Delete Button -->
+            <button
+              class="group relative bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-110 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 js-delete"
+              title="O'chirish"
+            >
+              <svg
+                class="w-4 h-4 transition-transform duration-200 group-hover:rotate-12"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                ></path>
+              </svg>
+            </button>
+
+            <!-- Edit Button -->
+            <button
+              class="group relative bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-3 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-110 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 js-edit"
+              title="Tahrirlash"
+            >
+              <svg
+                class="w-4 h-4 transition-transform duration-200 group-hover:rotate-12"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                ></path>
+              </svg>
+            </button>
+
+            <!-- Info Button -->
+            <a
+              class="group relative bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-3 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-110 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 js-info"
+              target="_blank"
+              title="Ma'lumotlar"
+            >
+              <svg
+                class="w-4 h-4 transition-transform duration-200 group-hover:rotate-12"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- Pagination -->
+    <div class="join mb-5" id="pagination"></div>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
